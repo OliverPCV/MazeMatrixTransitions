@@ -112,23 +112,27 @@ public class Game {
     private static int counter = 0;
     public static void update(long window) {
 
-
-        if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS) {
-            matrix = matrix.translate(0.001f, 0f, 0f);
-            //System.out.println("true");
-            isWPressed = true;
+        if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) { // Move forward
+            matrix = matrix.translate(0, 0.0008f, 0f);
         }
-
-        if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_RELEASE) {
-            //System.out.println("false");
+        if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS) { // Left
+            matrix = matrix.translate(-0.0008f, 0f, 0f);
         }
-
-
-
-
-
-
-
+        if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS) { // Move backwards
+            matrix = matrix.translate(0f, -0.0008f, 0f);
+        }
+        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS) { // Move right
+            matrix = matrix.translate(0.0008f, 0f, 0f);
+        }
+        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_Q) == GLFW.GLFW_PRESS) { // Rotate left
+            matrix = matrix.rotateZ(0.0008f);
+        }
+        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_E) == GLFW.GLFW_PRESS) { // Rotate right
+            matrix = matrix.rotateZ(-0.0008f);
+        }
+        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_R) == GLFW.GLFW_PRESS) { // Reset
+            matrix = matrix.rotationX(0f).scale(0.25f, 0.25f, 0.25f);
+        }
 
 
 
