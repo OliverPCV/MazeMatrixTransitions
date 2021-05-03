@@ -1,117 +1,56 @@
 package educanet;
 
+import educanet.models.Player;
+import educanet.models.Square;
+import educanet.utils.FileUtils;
 import org.joml.Matrix4f;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL33;
-import org.lwjgl.system.MemoryUtil;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Game {
 
-    private static final float[] vertices = {
-            0.5f, 0.5f, 0.0f, // 0 -> Top right
-            0.5f, -0.5f, 0.0f, // 1 -> Bottom right
-            -0.5f, -0.5f, 0.0f, // 2 -> Bottom left
-            -0.5f, 0.5f, 0.0f, // 3 -> Top left
-    };
-
-    private static final float[] colors = {
-            1.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f,
-    };
-
-    private static final int[] indices = {
-            0, 1, 3, // First triangle
-            1, 2, 3 // Second triangle
-    };
-
-    private static int squareVaoId;
-    private static int squareVboId;
-    private static int squareEboId;
-    private static int colorsId;
-
-    private static int uniformColorLocation;
-    private static int uniformMatrixLocation;
-
-    private static Matrix4f matrix = new Matrix4f()
-            .identity()
-            .scale(0.25f, 0.25f, 0.25f);
-    private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
-
-
     public static void init(long window) {
-        GLFW.glfwSetKeyCallback(window, (window1, key, scancode, action, mods) -> {
-            System.out.println(key);
-            System.out.println(action);
-        });
-
         // Setup shaders
         Shaders.initShaders();
-
-        uniformColorLocation = GL33.glGetUniformLocation(Shaders.shaderProgramId, "outColor");
-        uniformMatrixLocation = GL33.glGetUniformLocation(Shaders.shaderProgramId, "matrix");
-
-        // Generate all the ids
-        squareVaoId = GL33.glGenVertexArrays();
-        squareVboId = GL33.glGenBuffers();
-        squareEboId = GL33.glGenBuffers();
-        colorsId = GL33.glGenBuffers();
-
-        // Tell OpenGL we are currently using this object (vaoId)
-        GL33.glBindVertexArray(squareVaoId);
-
-        // Tell OpenGL we are currently writing to this buffer (eboId)
-        GL33.glBindBuffer(GL33.GL_ELEMENT_ARRAY_BUFFER, squareEboId);
-        IntBuffer ib = BufferUtils.createIntBuffer(indices.length)
-                .put(indices)
-                .flip();
-        GL33.glBufferData(GL33.GL_ELEMENT_ARRAY_BUFFER, ib, GL33.GL_STATIC_DRAW);
-
-        // Change to VBOs...
-        // Tell OpenGL we are currently writing to this buffer (vboId)
-        GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, squareVboId);
-
-        FloatBuffer fb = BufferUtils.createFloatBuffer(vertices.length)
-                .put(vertices)
-                .flip();
-
-        // Send the buffer (positions) to the GPU
-        GL33.glBufferData(GL33.GL_ARRAY_BUFFER, fb, GL33.GL_STATIC_DRAW);
-        GL33.glVertexAttribPointer(0, 3, GL33.GL_FLOAT, false, 0, 0);
-        GL33.glEnableVertexAttribArray(0);
-
-        // Clear the buffer from the memory (it's saved now on the GPU, no need for it here)
-        MemoryUtil.memFree(fb);
-
-        GL33.glUseProgram(Shaders.shaderProgramId);
-        GL33.glUniform3f(uniformColorLocation, 1.0f, 0.0f, 0.0f);
-
-        // Sending Mat4 to GPU
-        matrix.get(matrixBuffer);
-
-        GL33.glUniformMatrix4fv(uniformMatrixLocation, false, matrixBuffer);
-
-        // Clear the buffer from the memory (it's saved now on the GPU, no need for it here)
-        MemoryUtil.memFree(fb);
+        createPlayer();
+        prepareGamefield();
+        createGamefield();
     }
 
     public static void render(long window) {
+        // render Player
+        renderPlayer();
+        renderGamefield(); // TODO
+    }
 
-        // Draw using the glDrawElements function
-        GL33.glBindVertexArray(squareVaoId);
-        GL33.glDrawElements(GL33.GL_TRIANGLES, indices.length, GL33.GL_UNSIGNED_INT, 0);
+    public static void update(long window) {
+        movePlayer(window, Player.getMatrix());
+        // TODO collision
     }
 
 
-    public static boolean isWPressed = false;
-    private static int counter = 0;
-    public static void update(long window) {
+    // PLAYER
+    public static void createPlayer() {
+        Player p = new Player();
 
+        GL33.glUseProgram(Shaders.shaderProgramId); // use this shader to render
+        GL33.glBindVertexArray(Player.getSquareVaoId());
+        GL33.glDrawElements(GL33.GL_TRIANGLES, Player.getVertices().length, GL33.GL_UNSIGNED_INT, 0);
+    }
+
+    public static void renderPlayer() {
+        // Draw using the glDrawElements function
+        GL33.glUseProgram(Shaders.shaderProgramId);
+        GL33.glBindVertexArray(Player.getSquareVaoId());
+        GL33.glDrawElements(GL33.GL_TRIANGLES, Player.getIndices().length, GL33.GL_UNSIGNED_INT, 0);
+    }
+
+    public static void movePlayer(long window, Matrix4f matrix) { // TODO
         if(GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) { // Move forward
             matrix = matrix.translate(0, 0.0008f, 0f);
         }
@@ -134,11 +73,53 @@ public class Game {
             matrix = matrix.rotationX(0f).scale(0.25f, 0.25f, 0.25f);
         }
 
-
-
         // TODO: Send to GPU only if position updated
-        matrix.get(matrixBuffer);
-        GL33.glUniformMatrix4fv(uniformMatrixLocation, false, matrixBuffer);
+        matrix.get(Player.getMatrixBuffer());
+        GL33.glUniformMatrix4fv(Player.getUniformMatrixLocation(), false, Player.getMatrixBuffer());
+    }
+
+
+    // GAMEFIELD
+
+    public static ArrayList<Square> gamefieldObjectArrayList = new ArrayList<>();
+
+    public static String gameField;
+    public static int numberOfObjectsGamefield;
+
+
+    public static void prepareGamefield() {
+        // kod od Lukáše Petráčka, protože jsem nevěděl jak načíst ten soubor :)
+
+        String path = "src/main/gameResources/gamefield.txt";
+        File level = new File(path);
+
+        if (level.exists() && level.canRead()) //checks if maze file exists and is readable
+            gameField = FileUtils.readFile(path);
+
+
+        Matcher m = Pattern.compile("\r\n|\r|\n").matcher(gameField); //using matcher to not fill up gc with useless strings from .split();
+        while (m.find()) {
+            numberOfObjectsGamefield++;
+        }
+    }
+
+    public static void createGamefield() { // TODO
+        String[] objs = gameField.split("\n");
+
+        for (int i = 0; i < numberOfObjectsGamefield; i++) {
+            String[] objAtrribs = objs[i].split(";");
+            Square s = new Square(Float.parseFloat(objAtrribs[0]),Float.parseFloat(objAtrribs[1]),0f ,Float.parseFloat(objAtrribs[2]));
+            gamefieldObjectArrayList.add(s);
+        }
+    }
+
+    public static void renderGamefield() { // TODO
+        new Matrix4f().identity().get(Player.getMatrixBuffer());
+        GL33.glUniformMatrix4fv(Player.getUniformMatrixLocation(), false, Player.getMatrixBuffer());
+        for (int i = 0; i < numberOfObjectsGamefield; i++) {
+            Square object = gamefieldObjectArrayList.get(i);
+            if (object != null) object.draw();
+        }
     }
 
 }
