@@ -15,7 +15,7 @@ public class Main {
 
         // Create the window...
         // We can set multiple options with glfwWindowHint ie. fullscreen, resizability etc.
-        long window = GLFW.glfwCreateWindow(800, 600, "Gamefield colision", 0, 0);
+        long window = GLFW.glfwCreateWindow(800, 600, "Window", 0, 0);
         if (window == 0) {
             GLFW.glfwTerminate();
             throw new Exception("Unable to open window");

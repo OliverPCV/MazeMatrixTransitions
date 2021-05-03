@@ -33,7 +33,6 @@ public class Game {
         // TODO collision
     }
 
-
     // PLAYER
     public static void createPlayer() {
         Player p = new Player();
@@ -63,23 +62,9 @@ public class Game {
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS) { // Move right
             matrix = matrix.translate(0.0008f, 0f, 0f);
         }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_Q) == GLFW.GLFW_PRESS) { // Rotate left
-            matrix = matrix.rotateZ(0.0008f);
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_E) == GLFW.GLFW_PRESS) { // Rotate right
-            matrix = matrix.rotateZ(-0.0008f);
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_R) == GLFW.GLFW_PRESS) { // Reset
-            matrix = matrix.rotationX(0f).scale(0.25f, 0.25f, 0.25f);
-        }
-
-        // TODO: Send to GPU only if position updated
         matrix.get(Player.getMatrixBuffer());
         GL33.glUniformMatrix4fv(Player.getUniformMatrixLocation(), false, Player.getMatrixBuffer());
     }
-
-
-    // GAMEFIELD
 
     public static ArrayList<Square> gamefieldObjectArrayList = new ArrayList<>();
 
@@ -88,16 +73,15 @@ public class Game {
 
 
     public static void prepareGamefield() {
-        // kod od Lukáše Petráčka, protože jsem nevěděl jak načíst ten soubor :)
 
-        String path = "src/main/gameResources/gamefield.txt";
+        String path = "src/main/resources/1.txt";
         File level = new File(path);
 
-        if (level.exists() && level.canRead()) //checks if maze file exists and is readable
+        if (level.exists() && level.canRead())
             gameField = FileUtils.readFile(path);
 
 
-        Matcher m = Pattern.compile("\r\n|\r|\n").matcher(gameField); //using matcher to not fill up gc with useless strings from .split();
+        Matcher m = Pattern.compile("\r\n|\r|\n").matcher(gameField);
         while (m.find()) {
             numberOfObjectsGamefield++;
         }

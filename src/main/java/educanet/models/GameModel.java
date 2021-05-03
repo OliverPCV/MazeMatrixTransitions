@@ -7,34 +7,33 @@ import org.lwjgl.system.MemoryUtil;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public abstract class GameObject {
+public abstract class GameModel {
 
     public float x;
     public float y;
     public float z;
     public float size;
 
-    protected float[] vertices;
-    protected int[] indices;
-    protected float[] color;
+    float[] vertices;
+    int[] indices;
+    float[] color;
 
-    public        int vaoId;
-    protected final int vboId;
-    protected final int eboId;
-    protected final int colorId;
+    public int vaoId;
+    final int vboId;
+    final int eboId;
+    final int colorId;
 
-    protected FloatBuffer fb;
-    protected IntBuffer ib;
-    protected FloatBuffer cb;
+    FloatBuffer fb;
+    IntBuffer ib;
+    FloatBuffer cb;
 
-    public GameObject() {
+    public GameModel() {
         vaoId = GL33.glGenVertexArrays();
         vboId = GL33.glGenBuffers();
         eboId = GL33.glGenBuffers();
         colorId = GL33.glGenBuffers();
 
     }
-
 
     public void draw() {
         GL33.glBindVertexArray(vaoId);

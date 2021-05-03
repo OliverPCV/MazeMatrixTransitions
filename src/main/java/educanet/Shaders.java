@@ -4,9 +4,9 @@ import educanet.utils.FileUtils;
 import org.lwjgl.opengl.GL33;
 
 public class Shaders {
-    private static final String vertexShaderSource = FileUtils.readFile("res/vertex_shader.glsl");
+    private static final String vertexShaderSource = FileUtils.readFile("src/vertex_shader.glsl");
 
-    private static final String fragmentShaderSource = FileUtils.readFile("res/fragment_shader.glsl");
+    private static final String fragmentShaderSource = FileUtils.readFile("src/fragment_shader.glsl");
 
     public static int vertexShaderId;
     public static int fragmentShaderId;

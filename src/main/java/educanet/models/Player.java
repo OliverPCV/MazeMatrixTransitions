@@ -18,10 +18,10 @@ public class Player {
     };
 
     private static final float[] colors = {
-            1.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
     };
 
     private static final int[] indices = {
@@ -79,7 +79,7 @@ public class Player {
         MemoryUtil.memFree(fb);
 
         GL33.glUseProgram(Shaders.shaderProgramId);
-        GL33.glUniform3f(uniformColorLocation, 1.0f, 0.0f, 0.0f);
+        GL33.glUniform3f(uniformColorLocation, 1.0f, 1.0f, 1.0f);
 
         // Sending Mat4 to GPU
         matrix.get(matrixBuffer);

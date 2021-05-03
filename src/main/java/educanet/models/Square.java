@@ -1,14 +1,6 @@
 package educanet.models;
 
-import educanet.models.GameObject;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL33;
-import org.lwjgl.system.MemoryUtil;
-
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
-public class Square extends GameObject {
+public class Square extends GameModel {
 
 
     public Square(float x, float y, float z, float squareSize) {
@@ -24,13 +16,13 @@ public class Square extends GameObject {
                 x + squareSize  ,y             , z, // 1 -> Bottom Right
                 x               ,y             , z, // 2 -> Bottom Left
                 x               ,y + squareSize, z, // 3 -> Top    Left
-        }; //some help from Filip Makrlík
+        };
 
         this.color = new float[] {
-                1.0f, 1.0f, 1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
+                0.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 0.0f, 0.0f,
         };
 
         setup();
